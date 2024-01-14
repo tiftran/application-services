@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+use std::cmp::Ordering;
+
 use chrono::Local;
 
 /// The template parameter for a timestamp in a "raw" sponsored suggestion URL.

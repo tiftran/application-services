@@ -165,7 +165,7 @@ nimbus_events:
       - jhugman@mozilla.com
       - project-nimbus@mozilla.com
     expires: never
-    # Disabled by default. This needs a server-knobs rollout to ensure the volume is not overwhelming.
+    # Disabled by default. 
     disabled: true
   exposure:
     type: event
@@ -226,7 +226,7 @@ nimbus_events:
   enrollment_status:
     type: event
     description: >
-      Recorded for each enrollment status each time the SDK completes application of pending experiments.
+      Recorded for each
     extra_keys:
       slug:
         type: string
@@ -239,13 +239,13 @@ nimbus_events:
         description: The reason the client is in the noted status
       branch:
         type: string
-        description: The branch slug/identifier that was randomly chosen (if the client is enrolled)
+        description: The branch slug/ide
       error_string:
         type: string
-        description: If the enrollment resulted in an error, the associated error string
+        description: If the enrollment re
       conflict_slug:
         type: string
-        description: If the enrollment hit a feature conflict, the slug of the conflicting experiment/rollout
+        description: If the enrollment
     bugs:
       - https://mozilla-hub.atlassian.net/browse/EXP-3827
     data_reviews:

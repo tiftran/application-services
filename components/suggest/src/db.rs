@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-use std::{path::Path, sync::Arc};
+use std::{cmp::Ordering, path::Path, sync::Arc};
 
 use interrupt_support::{SqlInterruptHandle, SqlInterruptScope};
 use parking_lot::Mutex;
@@ -173,7 +173,7 @@ impl<'a> SuggestDao<'a> {
             ])
         };
 
-        let suggestions = statement.query_and_then(&*params, |row| -> Result<Option<Suggestion>> {
+        let mut suggestions: Vec<Suggestion> = statement.query_and_then(&*params, |row| -> Result<Option<Suggestion>> {
                 let suggestion_id: i64 = row.get("id")?;
                 let title = row.get("title")?;
                 let raw_url = row.get::<_, String>("url")?;
@@ -298,7 +298,14 @@ impl<'a> SuggestDao<'a> {
                 }
             }
         )?.flat_map(Result::transpose).collect::<Result<_>>()?;
+        
+        suggestions.sort_by(|a, b| match (a, b) {
+            (Suggestion::Amp { .. }, Suggestion::Amp { .. }) => Ordering::Equal,
+            (Suggestion::Amp { .. }, _) => Ordering::Less,
+            (_, Suggestion::Amp { .. }) => Ordering::Greater,
 
+            _ => format!("{:?}", a).cmp(&format!("{:?}", b)),
+        });
         Ok(suggestions)
     }
 

@@ -1739,6 +1739,16 @@ mod tests {
                 "icon": "2",
                 "impression_url": "https://example.com/impression_url",
                 "click_url": "https://example.com/click_url",
+            },{
+                "id": 0,
+                "advertiser": "MultiMatch",
+                "iab_category": "8 - Food & Drink",
+                "keywords": ["multimatch"],
+                "title": "AMP multiMatch",
+                "url": "https://www.example.com",
+                "icon": "2",
+                "impression_url": "https://example.com/impression_url",
+                "click_url": "https://example.com/click_url",
             }, {
                 "id": 0,
                 "advertiser": "Wikipedia",
@@ -1888,9 +1898,9 @@ mod tests {
                     keyword: "multimatch".into(),
                     providers: vec![
                         SuggestionProvider::Amp,
-                        SuggestionProvider::Wikipedia,
                         SuggestionProvider::Amo,
                         SuggestionProvider::Pocket,
+                        SuggestionProvider::Wikipedia,
                     ],
                     limit: None,
                 },
