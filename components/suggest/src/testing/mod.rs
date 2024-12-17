@@ -48,6 +48,7 @@ impl Suggestion {
             Self::Wikipedia { .. } => panic!("with_score not valid for wikipedia suggestions"),
             Self::Fakespot { score, .. } => score,
             Self::Exposure { score, .. } => score,
+            Self::AmpKw {  score, .. } => score,
         };
         *current_score = score;
         self

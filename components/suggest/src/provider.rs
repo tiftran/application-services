@@ -37,6 +37,7 @@ pub enum SuggestionProvider {
     AmpMobile = 8,
     Fakespot = 9,
     Exposure = 10,
+    AmpKeyword = 11,
 }
 
 impl fmt::Display for SuggestionProvider {
@@ -52,6 +53,7 @@ impl fmt::Display for SuggestionProvider {
             Self::AmpMobile => write!(f, "ampmobile"),
             Self::Fakespot => write!(f, "fakespot"),
             Self::Exposure => write!(f, "exposure"),
+            Self::AmpKeyword => write!(f, "ampkeyword"),
         }
     }
 }
@@ -111,6 +113,7 @@ impl SuggestionProvider {
             Self::AmpMobile => vec![SuggestRecordType::AmpMobile],
             Self::Fakespot => vec![SuggestRecordType::Fakespot],
             Self::Exposure => vec![SuggestRecordType::Exposure],
+            Self::AmpKeyword => vec![SuggestRecordType::AmpKw],
         }
     }
 }

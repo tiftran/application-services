@@ -23,9 +23,10 @@ use crate::{
     pocket::{split_keyword, KeywordConfidence},
     provider::SuggestionProvider,
     rs::{
-        DownloadedAmoSuggestion, DownloadedAmpSuggestion, DownloadedAmpWikipediaSuggestion,
-        DownloadedExposureSuggestion, DownloadedFakespotSuggestion, DownloadedMdnSuggestion,
-        DownloadedPocketSuggestion, DownloadedWikipediaSuggestion, Record, SuggestRecordId,
+        DownloadedAmoSuggestion, DownloadedAmpKeyword, DownloadedAmpSuggestion,
+        DownloadedAmpWikipediaSuggestion, DownloadedExposureSuggestion,
+        DownloadedFakespotSuggestion, DownloadedMdnSuggestion, DownloadedPocketSuggestion,
+        DownloadedWikipediaSuggestion, Record, SuggestRecordId,
     },
     schema::{clear_database, SuggestConnectionInitializer},
     suggestion::{cook_raw_suggestion_url, AmpSuggestionType, Suggestion},
@@ -855,6 +856,29 @@ impl<'a> SuggestDao<'a> {
         )?)
     }
 
+    /// Fetches fakespot suggestions
+    pub fn fetch_ampkw_suggestions(&self, query: &SuggestionQuery) -> Result<Vec<Suggestion>> {
+        let keyword = query.keyword.to_lowercase();
+        self.conn.query_rows_and_then_cached(
+            r#"
+        SELECT
+            block_id
+        FROM
+            amp_keywords
+        WHERE
+            keyword = :keyword
+        "#,
+            named_params! {":keyword": keyword},
+            |row| {
+                Ok(Suggestion::AmpKw {
+                    keyword: keyword.clone(),
+                    score: 1.0,
+                    block_id: row.get("id")?,
+                })
+            },
+        )
+    }
+
     /// Inserts all suggestions from a downloaded AMO attachment into
     /// the database.
     pub fn insert_amo_suggestions(
@@ -1112,6 +1136,30 @@ impl<'a> SuggestDao<'a> {
                 keyword_insert.execute(suggestion_id, &keyword, None, rank)?;
             }
         }
+        Ok(())
+    }
+
+    /// Inserts all keywords for an amp suggestion.
+    pub fn insert_amp_keywords(&mut self, records: &[DownloadedAmpKeyword]) -> Result<()> {
+        for record in records {
+            for keyword in record.keywords.clone() {
+                self.conn.execute(
+                    "INSERT INTO amp_hybrid_keywords(
+                         content_id,
+                         keyword
+                     )
+                     VALUES(
+                         :keyword,
+                         :content_id,
+                     )",
+                    named_params! {
+                        ":id": keyword,
+                        ":data": record.content_id,
+                    },
+                )?;
+            }
+        }
+
         Ok(())
     }
 

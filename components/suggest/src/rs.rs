@@ -209,6 +209,8 @@ pub(crate) enum SuggestRecord {
     Exposure(DownloadedExposureRecord),
     #[serde(rename = "geonames")]
     Geonames,
+    #[serde(rename = "amp-kw")]
+    AmpKw,
 }
 
 /// Enum for the different record types that can be consumed.
@@ -228,6 +230,7 @@ pub enum SuggestRecordType {
     Fakespot,
     Exposure,
     Geonames,
+    AmpKw,
 }
 
 impl From<&SuggestRecord> for SuggestRecordType {
@@ -245,6 +248,7 @@ impl From<&SuggestRecord> for SuggestRecordType {
             SuggestRecord::Fakespot => Self::Fakespot,
             SuggestRecord::Exposure(_) => Self::Exposure,
             SuggestRecord::Geonames => Self::Geonames,
+            SuggestRecord::AmpKw => Self::AmpKw,
         }
     }
 }
@@ -291,6 +295,7 @@ impl SuggestRecordType {
             Self::Fakespot => "fakespot-suggestions",
             Self::Exposure => "exposure-suggestions",
             Self::Geonames => "geonames",
+            Self::AmpKw => "amp-kw",
         }
     }
 
@@ -566,6 +571,13 @@ pub(crate) struct DownloadedExposureRecord {
 #[derive(Clone, Debug, Deserialize)]
 pub(crate) struct DownloadedExposureSuggestion {
     keywords: Vec<FullOrPrefixKeywords<String>>,
+}
+
+/// An Amp Keyword record
+#[derive(Clone, Debug, Deserialize)]
+pub(crate) struct DownloadedAmpKeyword {
+    pub keywords: Vec<String>,
+    pub content_id: i64,
 }
 
 impl DownloadedExposureSuggestion {

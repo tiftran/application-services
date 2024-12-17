@@ -101,6 +101,11 @@ pub enum Suggestion {
         suggestion_type: String,
         score: f64,
     },
+    AmpKw {
+        keyword: String,
+        score: f64,
+        block_id: i64,
+    },
 }
 
 impl PartialOrd for Suggestion {
@@ -183,6 +188,7 @@ impl Suggestion {
             | Self::Fakespot { score, .. }
             | Self::Exposure { score, .. } => *score,
             Self::Wikipedia { .. } => DEFAULT_SUGGESTION_SCORE,
+            Self::AmpKw { .. } => 1.0,
         }
     }
 }

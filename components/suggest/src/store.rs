@@ -422,6 +422,7 @@ impl<S> SuggestStoreInner<S> {
                     SuggestionProvider::Weather => dao.fetch_weather_suggestions(&query),
                     SuggestionProvider::Fakespot => dao.fetch_fakespot_suggestions(&query),
                     SuggestionProvider::Exposure => dao.fetch_exposure_suggestions(&query),
+                    SuggestionProvider::AmpKeyword => dao.fetch_ampkw_suggestions(&query),
                 })
             })?;
             suggestions.extend(new_suggestions);
@@ -644,6 +645,11 @@ where
             SuggestRecord::AmpMobile => {
                 self.download_attachment(dao, record, context, |dao, record_id, suggestions| {
                     dao.insert_amp_mobile_suggestions(record_id, suggestions)
+                })?;
+            }
+            SuggestRecord::AmpKw => {
+                self.download_attachment(dao, record, context, |dao, _record_id, records| {
+                    dao.insert_amp_keywords(records)
                 })?;
             }
             SuggestRecord::Icon => {
