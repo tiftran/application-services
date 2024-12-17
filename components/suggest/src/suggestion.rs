@@ -103,7 +103,6 @@ pub enum Suggestion {
     },
     AmpKw {
         keyword: String,
-        score: f64,
         block_id: i64,
     },
 }
@@ -187,8 +186,7 @@ impl Suggestion {
             | Self::Weather { score, .. }
             | Self::Fakespot { score, .. }
             | Self::Exposure { score, .. } => *score,
-            Self::Wikipedia { .. } => DEFAULT_SUGGESTION_SCORE,
-            Self::AmpKw { .. } => 1.0,
+            Self::Wikipedia { .. } | Self::AmpKw { .. } => DEFAULT_SUGGESTION_SCORE,
         }
     }
 }

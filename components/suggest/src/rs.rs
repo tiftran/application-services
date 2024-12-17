@@ -278,6 +278,7 @@ impl SuggestRecordType {
             Self::Fakespot,
             Self::Exposure,
             Self::Geonames,
+            Self::AmpKw,
         ]
     }
 
@@ -577,6 +578,7 @@ pub(crate) struct DownloadedExposureSuggestion {
 #[derive(Clone, Debug, Deserialize)]
 pub(crate) struct DownloadedAmpKeyword {
     pub keywords: Vec<String>,
+    #[serde(rename = "id")]
     pub content_id: i64,
 }
 

@@ -69,7 +69,7 @@ impl FromSql for SuggestionProvider {
 }
 
 impl SuggestionProvider {
-    pub fn all() -> [Self; 10] {
+    pub fn all() -> [Self; 11] {
         [
             Self::Amp,
             Self::Wikipedia,
@@ -81,6 +81,7 @@ impl SuggestionProvider {
             Self::AmpMobile,
             Self::Fakespot,
             Self::Exposure,
+            Self::AmpKeyword,
         ]
     }
 
@@ -97,6 +98,7 @@ impl SuggestionProvider {
             8 => Some(Self::AmpMobile),
             9 => Some(Self::Fakespot),
             10 => Some(Self::Exposure),
+            11 => Some(Self::AmpKeyword),
             _ => None,
         }
     }

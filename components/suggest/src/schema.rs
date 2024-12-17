@@ -23,7 +23,7 @@ use sql_support::{
 ///     `clear_database()` by adding their names to `conditional_tables`, unless
 ///     they are cleared via a deletion trigger or there's some other good
 ///     reason not to do so.
-pub const VERSION: u32 = 100;
+pub const VERSION: u32 = 32;
 
 /// The current Suggest database schema.
 pub const SQL: &str = "
@@ -602,13 +602,15 @@ CREATE INDEX geonames_alternates_geoname_id ON geonames_alternates(geoname_id);
                 )?;
                 Ok(())
             }
-            32 => {
+            31 => {
                 clear_database(tx)?;
-                tx.execute_batch("CREATE TABLE amp_hybrid_keywords(
+                tx.execute_batch(
+                    "CREATE TABLE amp_hybrid_keywords(
     keyword TEXT PRIMARY KEY,
     content_id INTEGER NOT NULL
 ) WITHOUT ROWID;
-")?;
+",
+                )?;
                 Ok(())
             }
             _ => Err(open_database::Error::IncompatibleVersion(version)),

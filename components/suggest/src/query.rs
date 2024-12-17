@@ -59,6 +59,14 @@ impl SuggestionQuery {
         }
     }
 
+    pub fn amp_kw(keyword: &str) -> Self {
+        Self {
+            keyword: keyword.into(),
+            providers: vec![SuggestionProvider::AmpKeyword],
+            ..Self::default()
+        }
+    }
+
     pub fn wikipedia(keyword: &str) -> Self {
         Self {
             keyword: keyword.into(),

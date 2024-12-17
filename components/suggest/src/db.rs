@@ -856,15 +856,15 @@ impl<'a> SuggestDao<'a> {
         )?)
     }
 
-    /// Fetches fakespot suggestions
+    /// Fetches ampkw suggestions
     pub fn fetch_ampkw_suggestions(&self, query: &SuggestionQuery) -> Result<Vec<Suggestion>> {
         let keyword = query.keyword.to_lowercase();
         self.conn.query_rows_and_then_cached(
             r#"
         SELECT
-            block_id
+            content_id
         FROM
-            amp_keywords
+            amp_hybrid_keywords
         WHERE
             keyword = :keyword
         "#,
@@ -872,8 +872,7 @@ impl<'a> SuggestDao<'a> {
             |row| {
                 Ok(Suggestion::AmpKw {
                     keyword: keyword.clone(),
-                    score: 1.0,
-                    block_id: row.get("id")?,
+                    block_id: row.get("content_id")?,
                 })
             },
         )
@@ -1143,20 +1142,27 @@ impl<'a> SuggestDao<'a> {
     pub fn insert_amp_keywords(&mut self, records: &[DownloadedAmpKeyword]) -> Result<()> {
         for record in records {
             for keyword in record.keywords.clone() {
-                self.conn.execute(
-                    "INSERT INTO amp_hybrid_keywords(
-                         content_id,
-                         keyword
-                     )
-                     VALUES(
-                         :keyword,
-                         :content_id,
-                     )",
-                    named_params! {
-                        ":id": keyword,
-                        ":data": record.content_id,
-                    },
-                )?;
+                // unwrap the encoded keyword - "foobar|3"
+                let mut iter = keyword.split('|');
+                let original = iter.next().unwrap();
+                let idx = str::parse::<usize>(iter.next().unwrap()).unwrap();
+                for i in idx..original.len() {
+                    let kw = &original[..=i];
+                    self.conn.execute(
+                        "INSERT INTO amp_hybrid_keywords(
+                             keyword,
+                             content_id
+                         )
+                         VALUES(
+                             :keyword,
+                             :content_id
+                         )",
+                        named_params! {
+                            ":keyword": kw,
+                            ":content_id": record.content_id,
+                        },
+                    )?;
+                }
             }
         }
 

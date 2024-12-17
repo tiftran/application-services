@@ -344,6 +344,7 @@ impl SuggestIngestionConstraints {
                 SuggestionProvider::AmpMobile,
                 SuggestionProvider::Fakespot,
                 SuggestionProvider::Exposure,
+                SuggestionProvider::AmpKeyword,
             ]),
             ..Self::default()
         }
@@ -1049,6 +1050,46 @@ pub(crate) mod tests {
         // ingested.
         assert_eq!(store.fetch_suggestions(SuggestionQuery::amp("la")), vec![]);
 
+        Ok(())
+    }
+
+    /// Tests amp_keyword.
+    #[test]
+    fn ingest_amp_keyword() -> anyhow::Result<()> {
+        before_each();
+
+        let store = TestStore::new(MockRemoteSettingsClient::default().with_record(
+            "amp-kw",
+            "1234",
+            json!([
+                {"keywords": ["amazon ring |9", "door cameras|5", "doorbell cameras|4"], "id": 59},
+                {"keywords": ["foobar|5"], "id": 10}
+            ]),
+        ));
+
+        store.ingest(SuggestIngestionConstraints::all_providers());
+
+        assert_eq!(
+            store.fetch_suggestions(SuggestionQuery::amp_kw("amazon rin")),
+            vec![Suggestion::AmpKw {
+                keyword: "amazon rin".into(),
+                block_id: 59,
+            }]
+        );
+        assert_eq!(
+            store.fetch_suggestions(SuggestionQuery::amp_kw("doorbell cameras")),
+            vec![Suggestion::AmpKw {
+                keyword: "doorbell cameras".into(),
+                block_id: 59,
+            }]
+        );
+        assert_eq!(
+            store.fetch_suggestions(SuggestionQuery::amp_kw("foobar")),
+            vec![Suggestion::AmpKw {
+                keyword: "foobar".into(),
+                block_id: 10,
+            }]
+        );
         Ok(())
     }
 
