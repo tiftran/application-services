@@ -1143,11 +1143,15 @@ impl<'a> SuggestDao<'a> {
         for record in records {
             for keyword in record.keywords.clone() {
                 // unwrap the encoded keyword - "foobar|3"
-                let mut iter = keyword.split('|');
-                let original = iter.next().unwrap();
-                let idx = str::parse::<usize>(iter.next().unwrap()).unwrap();
-                for i in idx..original.len() {
-                    let kw = &original[..=i];
+                let parts = keyword.split('|').collect::<Vec<_>>();
+                if parts.len() != 2 {
+                    continue;
+                }
+
+                let kw_chars = parts[0].chars().collect::<Vec<_>>();
+                let idx = str::parse::<usize>(parts[1]).unwrap();
+                for i in idx..kw_chars.len() {
+                    let kw = kw_chars[..=i].iter().collect::<String>();
                     self.conn.execute(
                         "INSERT INTO amp_hybrid_keywords(
                              keyword,
