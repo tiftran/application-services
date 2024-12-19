@@ -55,6 +55,7 @@ CREATE TABLE keywords(
 
 CREATE TABLE amp_hybrid_keywords(
     keyword TEXT PRIMARY KEY,
+    begin_position INTERGER NOT NULL,
     content_id INTEGER NOT NULL
 ) WITHOUT ROWID;
 
@@ -607,6 +608,7 @@ CREATE INDEX geonames_alternates_geoname_id ON geonames_alternates(geoname_id);
                 tx.execute_batch(
                     "CREATE TABLE amp_hybrid_keywords(
     keyword TEXT PRIMARY KEY,
+    begin_position INTERGER NOT NULL,
     content_id INTEGER NOT NULL
 ) WITHOUT ROWID;
 ",

@@ -1072,7 +1072,7 @@ pub(crate) mod tests {
         assert_eq!(
             store.fetch_suggestions(SuggestionQuery::amp_kw("amazon rin")),
             vec![Suggestion::AmpKw {
-                keyword: "amazon rin".into(),
+                keyword: "amazon ring ".into(),
                 block_id: 59,
             }]
         );

@@ -862,16 +862,17 @@ impl<'a> SuggestDao<'a> {
         self.conn.query_rows_and_then_cached(
             r#"
         SELECT
-            content_id
+            content_id,
+            keyword
         FROM
             amp_hybrid_keywords
         WHERE
-            keyword = :keyword
+            keyword GLOB :keyword || '*' AND length(:keyword) >= begin_position + 1
         "#,
             named_params! {":keyword": keyword},
             |row| {
                 Ok(Suggestion::AmpKw {
-                    keyword: keyword.clone(),
+                    keyword: row.get("keyword")?,
                     block_id: row.get("content_id")?,
                 })
             },
@@ -1148,25 +1149,25 @@ impl<'a> SuggestDao<'a> {
                     continue;
                 }
 
-                let kw_chars = parts[0].chars().collect::<Vec<_>>();
+                let kw_chars = parts[0];
                 let idx = str::parse::<usize>(parts[1]).unwrap();
-                for i in idx..kw_chars.len() {
-                    let kw = kw_chars[..=i].iter().collect::<String>();
-                    self.conn.execute(
-                        "INSERT INTO amp_hybrid_keywords(
-                             keyword,
-                             content_id
-                         )
+                self.conn.execute(
+                    "INSERT INTO amp_hybrid_keywords (
+                                keyword,
+                                begin_position,
+                                content_id
+                        )
                          VALUES(
                              :keyword,
+                             :begin_position,
                              :content_id
                          )",
-                        named_params! {
-                            ":keyword": kw,
-                            ":content_id": record.content_id,
-                        },
-                    )?;
-                }
+                    named_params! {
+                        ":keyword": kw_chars,
+                        ":begin_position": idx,
+                        ":content_id": record.content_id
+                    },
+                )?;
             }
         }
 
